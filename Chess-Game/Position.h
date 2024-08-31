@@ -1,6 +1,6 @@
 #pragma once
 
-enum class Col : int {
+enum Col : int {
 	A = 0,
 	B = 1,
 	C = 2,
@@ -8,10 +8,12 @@ enum class Col : int {
 	E = 4,
 	F = 5,
 	G = 6,
-	H = 7
+	H = 7,
+	KingSideCastle,
+	QueenSideCasle
 };
 
-enum class Row : int {
+enum Row : int {
 	One = 0,
 	Two = 1,
 	Three = 2,

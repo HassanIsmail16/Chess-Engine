@@ -47,13 +47,5 @@ const bool StateManager::hasState() const {
 }
 
 State& StateManager::getCurrentState() {
-	std::cout << "test" << std::endl;
 	return *(this->states.top().get());
 }
-
-
-
-
-
-
-

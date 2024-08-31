@@ -7,8 +7,10 @@ Game::Game(float width, float height, std::string title) {
 	this->view = std::move(std::make_shared<GameView>(this->window.get(), this->model.get()));
 	this->state_manager = StateManager(this->view.get(), this->model.get());
 	this->dt_clock = sf::Clock();
-	this->state_manager.addState(std::make_unique<MainMenuState>(this->view.get(), this->model.get(), &(this->state_manager)));
+	//this->state_manager.addState(std::make_unique<MainMenuState>(this->view.get(), this->model.get(), &(this->state_manager)));
+	this->state_manager.addState(std::make_unique<GameState>(this->view.get(), this->model.get(), &(this->state_manager)));
 	this->state_manager.processStateChanges();
+	//this->window->setFramerateLimit(60);
 }
 
 Game::~Game() {
@@ -28,13 +30,13 @@ void Game::handleWindowClosing() {
 
 void Game::run() {
 	while (this->window->isOpen()) {
-		this->handleWindowClosing();
-
 		this->updateDt();
 
 		this->state_manager.getCurrentState().run(this->dt);
 
 		this->state_manager.processStateChanges();
+
+		this->handleWindowClosing();
 	}
 }
 

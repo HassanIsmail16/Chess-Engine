@@ -156,7 +156,10 @@
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameModel.cpp" />
+    <ClCompile Include="GameMoveData.cpp" />
+    <ClCompile Include="GameMovementManager.cpp" />
     <ClCompile Include="GameState.cpp" />
+    <ClCompile Include="GameStatusManager.cpp" />
     <ClCompile Include="GameView.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainMenuState.cpp" />
@@ -174,7 +177,10 @@
     <ClInclude Include="Board.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameModel.h" />
+    <ClInclude Include="GameMoveData.h" />
+    <ClInclude Include="GameMovementManager.h" />
     <ClInclude Include="GameState.h" />
+    <ClInclude Include="GameStatusManager.h" />
     <ClInclude Include="GameView.h" />
     <ClInclude Include="MainMenuState.h" />
     <ClInclude Include="Move.h" />
