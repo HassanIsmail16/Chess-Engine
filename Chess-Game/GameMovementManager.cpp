@@ -95,7 +95,7 @@ bool GameMovementManager::willKingBeChecked(ChessColor king_color, Move move, Ga
 	bool is_king_checked = model.status_manager.isKingChecked(model, king_color);
 
 	this->undoLastMove(model);
-
+	
 	this->board->getPieceAt(move.start_position)->setIsMoved(initial_move_status);
 
 	return is_king_checked;

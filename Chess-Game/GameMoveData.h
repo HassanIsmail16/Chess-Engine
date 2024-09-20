@@ -2,14 +2,18 @@
 #include <utility>
 #include <memory>
 #include <optional>
+#include <SFML/System.hpp>
 #include "Move.h"
 #include "Piece.h"
 
+extern sf::Clock move_clock;
+
 struct MoveDataPair {
-	MoveDataPair(Move& move, std::unique_ptr<Piece> taken_over) : move(move), taken_over(std::move(taken_over)) {}
+	MoveDataPair(Move& move, std::unique_ptr<Piece> taken_over) : move(move), taken_over(std::move(taken_over)), time(move_clock.getElapsedTime()) {}
 
 	Move move;
 	std::unique_ptr<Piece> taken_over;
+	sf::Time time;
 };
 
 typedef std::vector<MoveDataPair> MoveData;
@@ -31,7 +35,7 @@ public:
 	MoveData black_move_data;
 private:
 	MoveDataPair& getLastMove(ChessColor player_color);
-
-	bool was_black_last = true;
+	
+	bool wasBlackLast();
 };
 
