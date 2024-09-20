@@ -21,21 +21,10 @@ public:
 
 	void update();
 	void updateTurn();
-	void updateBoard();
 
 	const std::vector<Position> getValidPositions(Piece* piece);
 
 	Board& getBoard();
-
-	const bool isMainPlayerTurn() const;
-
-	const bool mainPlayerWon();
-	const bool mainPlayerLost();
-	const bool isStaleMate();
-
-	bool isKingChecked(ChessColor king_color);
-
-	void handlePromotions();
 
 	GameMovementManager movement_manager;
 	GameStatusManager status_manager;
@@ -45,21 +34,10 @@ private:
 	void initBoard();
 	void initPlayers();
 
-	bool searchDiagonalCheck(Position& king_position, ChessColor& king_color);
-	bool searchStraightLineCheck(Position& king_position, ChessColor& king_color);
-	bool searchLineCheck(Position& king_position, ChessColor& king_color, const int dx, const int dy);
-	bool searchKnightCheck(Position& king_position, ChessColor& king_color);
-
 	// ---- attributes ----
 
 	Board board;
 	ChessColor main_player_color = ChessColor::White;
 	ChessColor current_player;
-	
-	/*
-	GameStatus game_status;
-	GameMoveData move_data;
-	PlayerData player_data;
-	*/
 };
 

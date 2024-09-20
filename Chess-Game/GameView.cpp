@@ -95,8 +95,8 @@ void GameView::drawPiece(const float& dt, Position& position) {
 }
 
 void GameView::updateSquareColors() {
-	bool is_white_checked = this->model->isKingChecked(ChessColor::White);
-	bool is_black_checked = this->model->isKingChecked(ChessColor::Black);
+	bool is_white_checked = this->model->status_manager.isKingChecked(*(this->model), ChessColor::White);
+	bool is_black_checked = this->model->status_manager.isKingChecked(*(this->model), ChessColor::Black);
 
 	for (int row = 0; row < BOARD_SIZE; row++) {
 		for (int col = 0; col < BOARD_SIZE; col++) {
@@ -120,9 +120,8 @@ void GameView::updateSquareColors() {
 		return;
 	}
 
-	selected_piece->printType();
-
 	std::vector<Position> valid_positions = this->model->getValidPositions(selected_piece);
+
 
 	for (Position& position : valid_positions) {
 		if (selected_piece->getPieceType() == PieceType::King) {

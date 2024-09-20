@@ -46,6 +46,7 @@ void Game::exit() {
 		this->state_manager.processStateChanges();
 	}
 
+	
 	std::cout << "Exiting Game..." << std::endl;
 }
 

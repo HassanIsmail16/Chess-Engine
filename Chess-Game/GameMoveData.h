@@ -20,15 +20,18 @@ public:
 	MoveDataPair& getLastWhiteMove();
 	MoveDataPair& getLastBlackMove();
 
+	bool noMoves();
+	bool noWhiteMoves();
+	bool noBlackMoves();
+
 	void pushMove(Move& new_move, GameModel& model);
 	void popMove();
 
+	MoveData white_move_data;
+	MoveData black_move_data;
 private:
 	MoveDataPair& getLastMove(ChessColor player_color);
 
-	bool wasBlackLast();
-
-	MoveData white_move_data;
-	MoveData black_move_data;
+	bool was_black_last = true;
 };
 

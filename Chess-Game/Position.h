@@ -30,9 +30,9 @@ public:
 	Position(Col col, Row row);
 	Position(int col, int row);
 
-	const bool& operator==(Position& other_position) const;
-	const bool& operator!=(Position& other_position) const;
-	
+	const bool& operator==(const Position& other_position) const;
+	const bool& operator!=(const Position& other_position) const;
+
 	Col col;
 	Row row;
 };

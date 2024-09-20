@@ -14,7 +14,7 @@ enum class PieceType {
 
 class GameModel;
 
-enum class ChessColor {
+enum class ChessColor : uint8_t {
 	White,
 	Black
 };
@@ -36,10 +36,10 @@ public:
 	bool isMoved();
 	void setIsMoved(bool is_moved);
 
+protected:
 	std::vector<Position> getValidStraightLinePositions(GameModel& model, Position current_position, ChessColor color);
 	std::vector<Position> getValidDiagonalPositions(GameModel& model, Position current_position, ChessColor color);
 
-protected:
 	PieceType type;
 	ChessColor color;
 	Position position;

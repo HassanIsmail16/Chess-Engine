@@ -4,22 +4,16 @@
 
 // <<<<<<<<<< Piece >>>>>>>>>>
 
-Piece::Piece(ChessColor color, Position position) {
-	this->color = color;
-	this->position = position;
-}
+Piece::Piece(ChessColor color, Position position) : color(color), position(position) {}
 
-Piece::Piece(const Piece& other) {
-	this->color = other.color;
-	this->position = other.position;
-	this->type = other.type;
-}
+Piece::Piece(const Piece& other) : color(other.color), position(other.position), type(other.type), is_moved(other.is_moved) {}
 
 Piece& Piece::operator=(const Piece& other) {
 	if (this != &other) {
 		this->color = other.color;
 		this->position = other.position;
 		this->type = other.type;
+		this->is_moved = other.is_moved;
 	}
 	return *this;
 }
@@ -103,21 +97,25 @@ std::vector<Position> Piece::getValidLinePositions(GameModel& model, Position cu
 	std::vector<Position> valid_positions;
 
 	for (int row = current_position.row + dy, col = current_position.col + dx; true; row += dy, col += dx) {
-		if (!model.getBoard().isInBound(Position(col, row))) {
-			return valid_positions;
+		const Position target_position(col, row);
+		
+		if (!model.getBoard().isInBound(target_position)) {
+			return valid_positions; // target position out of bounds
 		}
 
-		if (model.getBoard().hasPieceAt(Position(col, row))) {
-			if (model.getBoard().getPieceAt(Position(col, row))->getColor() != color
-				&& model.getBoard().getPieceAt(Position(col, row))->getPieceType() != PieceType::King) {
-				valid_positions.emplace_back(Position(col, row));
+		if (model.getBoard().hasPieceAt(target_position)) {
+			auto& piece_at_target_position(model.getBoard().getPieceAt(target_position));
+
+			if (piece_at_target_position->getColor() != color 
+				&& piece_at_target_position->getPieceType() != PieceType::King) {
+				valid_positions.emplace_back(target_position);
 			}
 
-			return valid_positions;
+			return valid_positions; // blocked by a piece (friendly or king)
 		}
 
-		if (model.movement_manager.willKingBeChecked(color, Move(current_position, Position(col, row)), model)) {
-			return valid_positions;
+		if (model.movement_manager.willKingBeChecked(color, Move(current_position, target_position), model)) {
+			return valid_positions; // target position would make own king in check
 		}
 
 		valid_positions.emplace_back(Position(col, row));
@@ -142,7 +140,7 @@ std::vector<Position> Pawn::getValidPositions(GameModel& model) {
 	Position diagonal_takeover_left(this->position.col - 1, this->position.row + step);
 	Position diagonal_takeover_right(this->position.col + 1, this->position.row + step);
 
-	auto isValidMove = [&](Position& target_position) -> bool {
+	auto isValidMove = [&](Position target_position) -> bool {
 		if (!model.getBoard().isInBound(target_position)) return false;
 		if (model.movement_manager.willKingBeChecked(color, Move(this->getPosition(), target_position), model)) {
 			return false;
@@ -150,17 +148,15 @@ std::vector<Position> Pawn::getValidPositions(GameModel& model) {
 		return true;
 		};
 
-	auto handleDiagonalMove = [&](Position& diagonal_position) {
-		if (isValidMove(diagonal_position) && model.getBoard().hasPieceAt(diagonal_position) 
-			&& model.getBoard().getPieceAt(diagonal_position)->getColor() != this->getColor()
-			&& model.getBoard().getPieceAt(diagonal_position)->getPieceType() != PieceType::King) {
-			valid_positions.emplace_back(diagonal_position);
+	for (auto& diagonal_position : {diagonal_takeover_left, diagonal_takeover_right}) {
+		if (isValidMove(diagonal_position) && model.getBoard().hasPieceAt(diagonal_position)) {
+			auto& piece(model.getBoard().getPieceAt(diagonal_position));
+
+			if (piece->getColor() != this->color && piece->getPieceType() != PieceType::King) {
+				valid_positions.emplace_back(diagonal_position);
+			}
 		}
-		};
-
-
-	handleDiagonalMove(diagonal_takeover_left);
-	handleDiagonalMove(diagonal_takeover_right);
+	}
 
 	if (isValidMove(single_step) && !model.getBoard().hasPieceAt(single_step)) {
 		valid_positions.emplace_back(single_step);
@@ -331,7 +327,7 @@ bool King::canCastleKingSide(GameModel& model) {
 bool King::canCastle(GameModel& model, const bool is_king_side) {
 	Position king_position(this->getPosition());
 
-	if (model.isKingChecked(this->getColor())) {
+	if (model.status_manager.isKingChecked(model, this->getColor())) {
 		return false;
 	}
 

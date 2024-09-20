@@ -22,7 +22,8 @@ void StateManager::removeState() {
 
 	this->state_removal_pending = true;
 
-	std::cout << "Removed state, new stack size: " << this->states.size() << std::endl;
+	
+	std::cout << "Removed state, new stack size : " << this->states.size() << std::endl;
 }
 
 void StateManager::replaceCurrentState(std::unique_ptr<State> new_state) {

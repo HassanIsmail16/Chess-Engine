@@ -20,13 +20,18 @@ public:
 	Piece* getSelectedPiece();
 
 	void makeMove(Move move, GameModel& model);
-	void undoLastMove();
+	void undoLastMove(GameModel& model);
 
 	bool willKingBeChecked(ChessColor king_color, Move move, GameModel& model);
 
 	GameMoveData& getMoveData();
+	
+	bool isPromotionPending();
+	void handlePawnPromotion(PieceType new_piece_type);
 
 private:
+	std::unique_ptr<Piece>& getLastMovingPiece();
+
 	Piece* selected_piece;
 	GameMoveData move_data;
 	Board* board;

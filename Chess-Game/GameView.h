@@ -42,9 +42,4 @@ private:
 	std::array<std::array<SquareColor, BOARD_SIZE>, BOARD_SIZE> square_colors;
 };
 
-/*
-	TODO: 
-	- add an asset manager to manager the sprites of the pieces
-	- figure out a way to draw the pieces without adding the piece type thing
-	- place some focus on comments
-*/
+// TODO: add an asset manager to manager the sprites of the pieces
