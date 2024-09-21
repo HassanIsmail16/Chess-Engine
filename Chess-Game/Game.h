@@ -13,7 +13,7 @@ public:
 	void run();
 	
 private:
-	void handleWindowClosing();
+	void handleWindowEvents();
 	void exit();
 	void updateDt();
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
+#include "TextureManager.h"
 #include "GameModel.h"
 #include <map>
 
@@ -26,6 +26,10 @@ public:
 
 	sf::RenderWindow& getWindow();
 
+	void updateView();
+
+	float getSquareSize() const;
+
 private: 
 	void drawGameStateBoard(const float& dt);
 	void drawSquare(const float& dt, Position& position);
@@ -40,6 +44,10 @@ private:
 	GameModel* model;
 
 	std::array<std::array<SquareColor, BOARD_SIZE>, BOARD_SIZE> square_colors;
+
+	TextureManager texture_manager;
+
+	float square_size = 50.f;
 };
 
 // TODO: add an asset manager to manager the sprites of the pieces

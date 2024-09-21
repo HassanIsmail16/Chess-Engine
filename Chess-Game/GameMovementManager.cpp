@@ -106,23 +106,7 @@ GameMoveData& GameMovementManager::getMoveData() {
 }
 
 bool GameMovementManager::isPromotionPending() {
-	if (this->move_data.noMoves()) {
-		return false;
-	}
-
-	auto& last_moving_piece(this->getLastMovingPiece());
-
-	if (last_moving_piece->getPieceType() != PieceType::Pawn) {
-		return false;
-	} // last piece not a pawn
-
-	Position last_moving_piece_position(last_moving_piece->getPosition());
-
-	if (last_moving_piece_position.row != 0 && last_moving_piece_position.row != 7) {
-		return false;
-	} // pawn was not on edges
-
-	return true;
+	return this->getPromotionPawn();
 }
 
 void GameMovementManager::handlePawnPromotion(PieceType new_piece_type) {
@@ -130,7 +114,7 @@ void GameMovementManager::handlePawnPromotion(PieceType new_piece_type) {
 		return;
 	} // no promotions are pending
 
-	auto& promotion_pawn(this->getLastMovingPiece());
+	auto& promotion_pawn(*(this->getPromotionPawn()));
 
 	Position promotion_position(promotion_pawn->getPosition());
 
@@ -158,12 +142,23 @@ void GameMovementManager::handlePawnPromotion(PieceType new_piece_type) {
 	}
 }
 
-// WARNING: will crash if no moves were done
-// TODO: always returns a fucking white piece for some reason
-std::unique_ptr<Piece>& GameMovementManager::getLastMovingPiece() {
-	Move& last_move(this->move_data.getLastMove().move);
+std::unique_ptr<Piece>* GameMovementManager::getPromotionPawn() {
+	auto isPromotion = [this](Position& position) -> bool {
+		return this->board->hasPieceAt(position) && this->board->getPieceAt(position)->getPieceType() == PieceType::Pawn;
+		};
 
-	auto& last_moving_piece(this->board->getPieceAt(last_move.end_position));
+	for (int col = 0; col < BOARD_SIZE; col++) {
+		Position white_promotion_position(col, 7);
+		Position black_promotion_position(col, 0);
 
-	return last_moving_piece;
+		if (isPromotion(white_promotion_position)) {
+			return &this->board->getPieceAt(white_promotion_position);
+		}
+
+		if (isPromotion(black_promotion_position)) {
+			return &this->board->getPieceAt(black_promotion_position);
+		}
+	}
+	
+	return nullptr;
 }

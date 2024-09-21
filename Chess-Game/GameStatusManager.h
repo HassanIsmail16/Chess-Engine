@@ -29,8 +29,8 @@ private:
 	bool insufficientMaterials(GameModel& model);
 	bool isDrawByRepitition(GameModel& model);
 
+	bool playerHasMoves(GameModel& model, ChessColor player_color);
 	bool isPlayerStale(GameModel& model, ChessColor player_color);
-
 	bool isCheckMated(GameModel& model, ChessColor player_color);
 
 	bool searchDiagonalCheck(GameModel& model, Position& king_position, ChessColor& king_color);
@@ -42,6 +42,5 @@ private:
 
 	ChessColor current_player;
 	std::unordered_map<std::string, int> board_state_history;
-
 };
 

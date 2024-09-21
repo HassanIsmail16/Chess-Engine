@@ -5,12 +5,12 @@ std::map<SquareColor, sf::Color> square_color_match;
 
 GameView::GameView(sf::RenderWindow* window, GameModel* model) : window(window), model(model) {
 	// TODO: Figure out a better way to handle this map
-	square_color_match[SquareColor::Black] = sf::Color::Blue;
-	square_color_match[SquareColor::White] = sf::Color::White;
-	square_color_match[SquareColor::Active] = sf::Color::Red;
-	square_color_match[SquareColor::Highlight] = sf::Color::Yellow;
-	square_color_match[SquareColor::Check] = sf::Color::Magenta;
-	square_color_match[SquareColor::TakeOver] = sf::Color::Black;
+	square_color_match[SquareColor::Black] = sf::Color(168, 125, 81);
+	square_color_match[SquareColor::White] = sf::Color(247, 206, 163);
+	square_color_match[SquareColor::Active] = sf::Color(214, 152, 88);
+	square_color_match[SquareColor::Highlight] = sf::Color(248, 255, 176);
+	square_color_match[SquareColor::Check] = sf::Color(255, 77, 0);
+	square_color_match[SquareColor::TakeOver] = sf::Color(255, 91, 77);
 }
 
 void GameView::renderMainMenuStateView(const float& dt) {
@@ -31,6 +31,37 @@ sf::RenderWindow& GameView::getWindow() {
 	return *(this->window);
 }
 
+void GameView::updateView() {
+	// Get current window dimensions
+	float width = static_cast<float>(this->window->getSize().x);
+	float height = static_cast<float>(this->window->getSize().y);
+
+	// Calculate size for a square view
+	float size = std::min(width, height);
+
+	// Create a square view
+	sf::View view(sf::FloatRect(0, 0, size, size));
+
+	// Center the view in the window
+	view.setCenter(size / 2, size / 2);
+
+	// Set the viewport to fill the window while maintaining a 1:1 aspect ratio
+	float left = (width - size) / 2 / width;
+	float top = (height - size) / 2 / height;
+	float viewportWidth = size / width;
+	float viewportHeight = size / height;
+
+	view.setViewport(sf::FloatRect(left, top, viewportWidth, viewportHeight));
+
+	// Apply the view
+	this->window->setView(view);
+}
+
+
+float GameView::getSquareSize() const {
+	return this->square_size;
+}
+
 void GameView::drawGameStateBoard(const float& dt) {
 	this->updateSquareColors();
 
@@ -47,11 +78,13 @@ void GameView::drawGameStateBoard(const float& dt) {
 
 void GameView::drawSquare(const float& dt, Position& position) {
 	// if the sum of the row and col is even the square will be black, else it'll be white
-	sf::Vector2f square_size(50.f, 50.f);
+	float square_size = std::min(this->window->getSize().x, this->window->getSize().y) / 8.0f;
 
-	sf::Vector2f square_position(square_size.x * static_cast<float>(position.col), square_size.y * static_cast<float>(position.row));
+	this->square_size = square_size;
 
-	sf::RectangleShape square(square_size);
+	sf::Vector2f square_position(square_size * static_cast<float>(position.col), square_size * static_cast<float>(position.row));
+
+	sf::RectangleShape square(sf::Vector2f(square_size, square_size)); // Update size here
 
 	SquareColor square_color_key = this->getSquareColor(position);
 
@@ -71,25 +104,19 @@ void GameView::drawPiece(const float& dt, Position& position) {
 
 	auto& current_piece = this->model->getBoard().getPieceAt(position);
 
-	sf::Color piece_color = (current_piece->getColor() == ChessColor::White) ? sf::Color::Green : sf::Color::Magenta;
+	sf::Vector2f piece_position {
+		square_size * static_cast<float>(position.col) + square_size / 2,
+		square_size * static_cast<float>(position.row) + square_size / 2
+	};
 
-	float radius = 12.5f;
-
-	sf::Vector2f piece_position(50.f * static_cast<float>(position.col) + 25.f, 50.f * static_cast<float>(position.row) + 25.f);
-
-	sf::Vector2f origin(radius, radius);
-
-	sf::CircleShape piece(radius);
-
-	piece.setOrigin(origin);
-
-	piece.setPosition(piece_position);
-
-	if (this->model->movement_manager.getSelectedPiece() == this->model->getBoard().getPieceAt(position).get()) {
-		piece_color = sf::Color::Red;
-	}
+	sf::Sprite piece(this->texture_manager.getTexture(current_piece->getPieceType(), current_piece->getColor()));
 	
-	piece.setFillColor(piece_color);
+
+	float piece_scale = this->square_size / piece.getLocalBounds().width + 0.1;
+
+	piece.setScale(piece_scale, piece_scale);
+	piece.setOrigin(piece.getLocalBounds().width / 2, piece.getLocalBounds().height / 2);
+	piece.setPosition(piece_position);
 
 	this->window->draw(piece);
 }
@@ -119,6 +146,8 @@ void GameView::updateSquareColors() {
 	if (selected_piece == nullptr || !model->status_manager.isCurrentPlayerPiece(selected_piece)) {
 		return;
 	}
+
+	this->setSquareColor(selected_piece->getPosition(), SquareColor::Active);
 
 	std::vector<Position> valid_positions = this->model->getValidPositions(selected_piece);
 

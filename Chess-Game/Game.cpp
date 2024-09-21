@@ -7,6 +7,9 @@ Game::Game(float width, float height, std::string title) {
 	this->view = std::move(std::make_shared<GameView>(this->window.get(), this->model.get()));
 	this->state_manager = StateManager(this->view.get(), this->model.get());
 	this->dt_clock = sf::Clock();
+
+	this->view->updateView();
+
 	//this->state_manager.addState(std::make_unique<MainMenuState>(this->view.get(), this->model.get(), &(this->state_manager)));
 	this->state_manager.addState(std::make_unique<GameState>(this->view.get(), this->model.get(), &(this->state_manager)));
 	this->state_manager.processStateChanges();
@@ -17,13 +20,17 @@ Game::~Game() {
 	this->exit();
 }
 
-void Game::handleWindowClosing() {
+void Game::handleWindowEvents() {
 	sf::Event event;
 	
 	while (this->window->pollEvent(event)) {
 		if (event.type == sf::Event::Closed) {
 			this->window->close();
 			this->exit();
+		}
+
+		if (event.type == sf::Event::Resized) {
+			this->view->updateView();
 		}
 	}
 }
@@ -36,7 +43,7 @@ void Game::run() {
 
 		this->state_manager.processStateChanges();
 
-		this->handleWindowClosing();
+		this->handleWindowEvents();
 	}
 }
 

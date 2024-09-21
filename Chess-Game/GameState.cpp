@@ -42,9 +42,16 @@ void GameState::handleInput() {
 }
 
 void GameState::update(const float& dt) {
-	this->model->status_manager.isDraw(*(this->model));
-	this->model->status_manager.hasBlackWon(*(this->model));
-	this->model->status_manager.hasWhiteWon(*(this->model));
+	if (this->model->status_manager.isDraw(*(this->model))) {
+		std::cout << "DRAW" << std::endl;
+	}
+	if (this->model->status_manager.hasBlackWon(*(this->model))) {
+		std::cout << "black wins" << std::endl;
+	}
+	
+	if (this->model->status_manager.hasWhiteWon(*(this->model))) {
+		std::cout << "white wins" << std::endl;
+	}
 }
 
 void GameState::render(const float& dt) {
@@ -53,9 +60,10 @@ void GameState::render(const float& dt) {
 
 Position GameState::getSquareAtMousePosition() const {
 	sf::Vector2i mouse_position = sf::Mouse::getPosition(this->view->getWindow());
+	sf::Vector2f global_position = this->view->getWindow().mapPixelToCoords(mouse_position);
 
-	int selected_col_index = mouse_position.x / 50;
-	int selected_row_index = mouse_position.y / 50;
+	int selected_col_index = global_position.x / this->view->getSquareSize();
+	int selected_row_index = global_position.y / this->view->getSquareSize();
 
 	return Position(selected_col_index, selected_row_index);
 }

@@ -198,11 +198,7 @@ bool GameStatusManager::isDrawByRepitition(GameModel& model) {
 	return false;
 }
 
-bool GameStatusManager::isPlayerStale(GameModel& model, ChessColor player_color) {
-	if (model.status_manager.isKingChecked(model, player_color)) {
-		return false;
-	} // not stalemate if own king is checked
-
+bool GameStatusManager::playerHasMoves(GameModel& model, ChessColor player_color) {
 	for (int row = 0; row < BOARD_SIZE; row++) {
 		for (int col = 0; col < BOARD_SIZE; col++) {
 			Position current_position(col, row);
@@ -218,27 +214,20 @@ bool GameStatusManager::isPlayerStale(GameModel& model, ChessColor player_color)
 			}
 
 			if (!current_piece->getValidPositions(model).empty()) {
-				return false;
+				return true;
 			}
 		}
 	}
-	
-	return true;
+
+	return false;
 }
 
-// TODO: fix this by checking if player has no moves (extract function)
+bool GameStatusManager::isPlayerStale(GameModel& model, ChessColor player_color) {
+	return !this->isKingChecked(model, player_color) && !this->playerHasMoves(model, player_color);
+}
+
 bool GameStatusManager::isCheckMated(GameModel& model, ChessColor player_color) {
-	if (!this->isKingChecked(model, player_color)) {
-		return false;
-	}
-
-	std::vector<Position> king_valid_positions = model.getBoard().getKing(player_color)->getValidPositions(model);
-
-	if (king_valid_positions.empty()) {
-		std::cout << (player_color == ChessColor::White ? "White" : "Black") << " is checkmated" << std::endl;
-	}
-
-	return king_valid_positions.empty();
+	return this->isKingChecked(model, player_color) && !this->playerHasMoves(model, player_color);
 }
 
 bool GameStatusManager::searchDiagonalCheck(GameModel& model, Position& king_position, ChessColor& king_color) {
