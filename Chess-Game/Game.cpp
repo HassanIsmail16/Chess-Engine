@@ -20,30 +20,27 @@ Game::~Game() {
 	this->exit();
 }
 
-void Game::handleWindowEvents() {
-	sf::Event event;
-	
-	while (this->window->pollEvent(event)) {
-		if (event.type == sf::Event::Closed) {
-			this->window->close();
-			this->exit();
-		}
-
-		if (event.type == sf::Event::Resized) {
-			this->view->updateView();
-		}
-	}
-}
 
 void Game::run() {
+	sf::Event event;
+
 	while (this->window->isOpen()) {
 		this->updateDt();
 
-		this->state_manager.getCurrentState().run(this->dt);
+		this->state_manager.getCurrentState().run(this->dt, event);
 
 		this->state_manager.processStateChanges();
 
-		this->handleWindowEvents();
+		while (this->window->pollEvent(event)) {
+			if (event.type == sf::Event::Closed) {
+				this->window->close();
+				this->exit();
+			}
+
+			if (event.type == sf::Event::Resized) {
+				this->view->updateView();
+			}
+		}
 	}
 }
 

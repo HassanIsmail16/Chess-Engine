@@ -34,6 +34,11 @@ private:
 	void drawGameStateBoard(const float& dt);
 	void drawSquare(const float& dt, Position& position);
 	void drawPiece(const float& dt, Position& position);
+	void drawPlan(const float& dt);
+	void drawArrow(const float& dt, ArrowData& arrow_data);
+	void drawCircle(const float& dt, ArrowData& circle_data);
+
+	bool isCircle(ArrowData& arrow_data);
 
 	void updateSquareColors();
 	void setSquareColor(Position position, SquareColor new_color);

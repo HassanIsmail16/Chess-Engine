@@ -103,6 +103,10 @@ std::vector<Position> Piece::getValidLinePositions(GameModel& model, Position cu
 			return valid_positions; // target position out of bounds
 		}
 
+		if (model.movement_manager.willKingBeChecked(color, Move(current_position, target_position), model)) {
+			continue; // target position would make own king in check
+		}
+
 		if (model.getBoard().hasPieceAt(target_position)) {
 			auto& piece_at_target_position(model.getBoard().getPieceAt(target_position));
 
@@ -112,10 +116,6 @@ std::vector<Position> Piece::getValidLinePositions(GameModel& model, Position cu
 			}
 
 			return valid_positions; // blocked by a piece (friendly or king)
-		}
-
-		if (model.movement_manager.willKingBeChecked(color, Move(current_position, target_position), model)) {
-			return valid_positions; // target position would make own king in check
 		}
 
 		valid_positions.emplace_back(Position(col, row));

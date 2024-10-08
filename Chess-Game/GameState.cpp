@@ -5,10 +5,10 @@ GameState::GameState(GameView* view, GameModel* model, StateManager* state_manag
 	this->init();
 }
 
-void GameState::run(const float& dt) {
+void GameState::run(const float& dt, sf::Event& event) {
 	this->update(dt);
 	
-	this->handleInput();
+	this->handleInput(event);
 
 	this->render(dt);
 }
@@ -18,27 +18,46 @@ void GameState::init() {
 	return;
 }
 
-void GameState::handleInput() {
+void GameState::handleInput(sf::Event& event) {
 	this->handlePawnPromotion();
 
 	if (!this->isActionAllowed()) {
 		return;
 	}
 
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-		// update action time
+	// Handle left mouse button
+	if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+		// Update action time
 		last_action_time = this->clock.getElapsedTime();
 
-		Piece* selected_piece(this->model->movement_manager.getSelectedPiece());
+		Piece* selected_piece = this->model->movement_manager.getSelectedPiece();
 
 		if (this->isValidPlayerPiece(selected_piece)) {
 			this->handleMovement(selected_piece);
-					std::cout << "num white moves: " << this->model->movement_manager.getMoveData().white_move_data.size() << std::endl
-			<< "num black moves: " << this->model->movement_manager.getMoveData().black_move_data.size() << std::endl;
-		} 
+			std::cout << "num white moves: " << this->model->movement_manager.getMoveData().white_move_data.size() << std::endl
+				<< "num black moves: " << this->model->movement_manager.getMoveData().black_move_data.size() << std::endl;
+		}
 
 		this->selectPieceAtMousePosition();
 	}
+
+	// Handle right mouse button
+	if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right) {
+		this->is_dragging = true;
+
+		auto current_square = this->getSquareAtMousePosition();
+		this->model->planning_manager.createArrow(current_square);
+	} else if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Right) {
+		this->is_dragging = false;
+		this->model->planning_manager.releaseCurrentArrow();
+	}
+
+	if (is_dragging) {
+		auto current_square = this->getSquareAtMousePosition();
+		this->model->planning_manager.updateCurrentArrow(current_square);
+	}
+
+	this->model->planning_manager.printArrows();
 }
 
 void GameState::update(const float& dt) {
@@ -62,8 +81,8 @@ Position GameState::getSquareAtMousePosition() const {
 	sf::Vector2i mouse_position = sf::Mouse::getPosition(this->view->getWindow());
 	sf::Vector2f global_position = this->view->getWindow().mapPixelToCoords(mouse_position);
 
-	int selected_col_index = global_position.x / this->view->getSquareSize();
-	int selected_row_index = global_position.y / this->view->getSquareSize();
+	int selected_col_index = std::clamp(static_cast<int>(global_position.x / this->view->getSquareSize()), 0, 7);
+	int selected_row_index = std::clamp(static_cast<int>(global_position.y / this->view->getSquareSize()), 0, 7);
 
 	return Position(selected_col_index, selected_row_index);
 }

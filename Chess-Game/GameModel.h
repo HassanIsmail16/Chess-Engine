@@ -4,6 +4,7 @@
 #include "Move.h"
 #include "GameMovementManager.h"
 #include "GameStatusManager.h"
+#include "GamePlanningManager.h"
 #include <optional>
 
 /*
@@ -28,6 +29,8 @@ public:
 
 	GameMovementManager movement_manager;
 	GameStatusManager status_manager;
+	GamePlanningManager planning_manager;
+	
 private:
 	// ---- methods ----
 

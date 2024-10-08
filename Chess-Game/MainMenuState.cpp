@@ -6,18 +6,18 @@ MainMenuState::MainMenuState(GameView* view, GameModel* model, StateManager* sta
 	this->init();
 }
 
-void MainMenuState::run(const float& dt) {
+void MainMenuState::run(const float& dt, sf::Event& event) {
 	this->update(dt);
 
-	this->handleInput();
+	this->handleInput(event);
 
 	this->render(dt);
 }
 
 void MainMenuState::init() {}
 
-void MainMenuState::handleInput() {
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
+void MainMenuState::handleInput(sf::Event& event) {
+	if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Enter) {
 		std::cout << "Exiting MainMenuState..." << std::endl;
 
 		auto new_state = std::make_unique<GameState>(this->view, this->model, this->state_manager);

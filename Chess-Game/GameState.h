@@ -7,11 +7,11 @@ public:
 	GameState(GameView* view, GameModel* model, StateManager* state_manager);
 
 	// main game loop
-	void run(const float& dt) override;
+	void run(const float& dt, sf::Event& event) override;
 
 private:
 	void init() override;
-	void handleInput() override;
+	void handleInput(sf::Event& event) override;
 	void update(const float& dt) override;
 	void render(const float& dt) override;
 	
@@ -53,5 +53,6 @@ private:
 	sf::Clock clock; // clock to keep track of the time between actions
 	sf::Time last_action_time; // store the time of the last action 
 	const sf::Time DEBOUNCE_TIME = sf::seconds(0.2f); // minimum time between allowed actions
+	bool is_dragging = false;
 };
 
